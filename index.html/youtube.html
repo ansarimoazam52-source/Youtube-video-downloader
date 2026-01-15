@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Youtube Downloader</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+        url("https://i.pinimg.com/736x/7d/c9/ed/7dc9ed976c47041f30049b17a90bcb21.jpg");
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Floating YouTube icons */
+    .yt-icons span {
+      position: absolute;
+      color: rgba(255, 0, 0, 0.35);
+      font-size: 80px;
+      animation: float 10s linear infinite;
+    }
+    .yt-icons span:nth-child(1) { left: 10%; animation-duration: 12s; }
+    .yt-icons span:nth-child(2) { left: 30%; font-size: 60px; animation-duration: 9s; }
+    .yt-icons span:nth-child(3) { left: 60%; font-size: 100px; animation-duration: 14s; }
+    .yt-icons span:nth-child(4) { left: 85%; font-size: 70px; animation-duration: 11s; }
+
+    @keyframes float {
+      from { bottom: -120px; transform: rotate(0deg); }
+      to { bottom: 110%; transform: rotate(360deg); }
+    }
+
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow:
+        0 0 30px rgba(255, 0, 0, 0.35),
+        0 15px 40px rgba(0, 0, 0, 0.6);
+      animation: fadeIn 0.8s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input[type="submit"] {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff0000, #ff4d4d);
+      color: #fff;
+      cursor: pointer;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 rgba(255,0,0,0.6); }
+      50% { box-shadow: 0 0 20px rgba(255,0,0,0.9); }
+      100% { box-shadow: 0 0 0 rgba(255,0,0,0.6); }
+    }
+
+    .name {
+      margin-top: 12px;
+      text-align: center;
+      background: rgba(192, 14, 14, 0.55);
+      border-radius: 12px;
+      padding: 6px;
+      font-size: 13px;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .video-card {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .video-card img {
+      width: 100%;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+
+    .video-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .video-duration {
+      font-size: 13px;
+      opacity: 0.85;
+      margin-bottom: 12px;
+    }
+
+    .downloads {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .downloads button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff7a18, #ffb347);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* ======================
+       MOBILE RESPONSIVE
+    ====================== */
+    @media (max-width: 768px) {
+      form {
+        flex-direction: column;
+      }
+
+      input[type="submit"] {
+        width: 100%;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      .yt-icons span {
+        font-size: 45px;
+      }
+    }
+
+    @media (max-width: 400px) {
+      h2 {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="yt-icons">
+    <span>▶</span><span>▶</span><span>▶</span><span>▶</span>
+  </div>
+
+  <div class="container">
+    <h2>🎬 Youtube Video Downloader</h2>
+
+    <form onsubmit="downloadVideoByURL(event)">
+      <input type="text" id="videoURL" placeholder="Paste YouTube URL..." required>
+      <input type="submit" value="Download">
+    </form>
+
+    <div class="name">Created by: Moazam Muavia Ansari</div>
+
+    <div class="loading" id="loadingText">⏳ Fetching video info...</div>
+
+    <div class="video-card" id="videoCard">
+      <img id="videoThumbnail">
+      <div class="video-title" id="videoTitle"></div>
+      <div class="video-duration">Duration: <span id="videoDuration"></span> sec</div>
+      <div class="downloads" id="downloadBtns"></div>
+    </div>
+  </div>
+
+  <script>
+    function downloadVideoByURL(e) {
+      e.preventDefault();
+
+      const url = videoURL.value;
+      loadingText.style.display = "block";
+      videoCard.style.display = "none";
+
+      fetch("https://api.vidssave.com/api/contentsite_api/media/parse", {
+        method: "POST",
+        headers: {
+          "content-type": "application/x-www-form-urlencoded"
+        },
+        body: `auth=20250901majwlqo&domain=api-ak.vidssave.com&origin=source&link=${url}`
+      })
+      .then(res => res.json())
+      .then(data => {
+        loadingText.style.display = "none";
+        videoCard.style.display = "block";
+
+        videoThumbnail.src = data.data.thumbnail;
+        videoTitle.innerText = data.data.title;
+        videoDuration.innerText = data.data.duration;
+
+        downloadBtns.innerHTML = "";
+        data.data.resources.forEach(v => {
+          if (v.download_url) {
+            downloadBtns.innerHTML += `
+              <a href="${v.download_url}" target="_blank">
+                <button>⬇ ${v.format} | ${v.quality}</button>
+              </a>
+            `;
+          }
+        });
+      })
+      .catch(() => {
+        loadingText.innerText = "❌ Error fetching video";
+      });
+    }
+  </script>
+
+</body>
+</html>
